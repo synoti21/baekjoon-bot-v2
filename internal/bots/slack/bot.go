@@ -24,46 +24,42 @@ func NewSlackBot() bots.Interface {
 	}
 }
 
-func (b *Bot) Init() error {
+func (b *Bot) RegisterUser(userID string, chanID string) error {
 	panic("not implemented") // TODO: Implement
 }
 
-func (b *Bot) RegisterUser(uid string) error {
+func (b *Bot) WithdrawUser(userID string, chanID string) error {
 	panic("not implemented") // TODO: Implement
 }
 
-func (b *Bot) WithdrawUser(uid string) error {
+func (b *Bot) SendProbToUser(userID string) error {
 	panic("not implemented") // TODO: Implement
 }
 
-func (b *Bot) SendProbToUser(uid string) error {
+func (b *Bot) SendProbToUserByCategory(userID string, chanID string, pc consts.ProbCategory) error {
 	panic("not implemented") // TODO: Implement
 }
 
-func (b *Bot) SendProbToUserByCategory(uid string, pc consts.ProbCategory) error {
+func (b *Bot) SendSimliarProbByPID(probID string, userID string, chanID string) error {
 	panic("not implemented") // TODO: Implement
 }
 
-func (b *Bot) SendSimliarProbByPID(pid string, uid string) error {
+func (b *Bot) SendSimilarProbByContent(probContent string, userID string, chanID string) error {
 	panic("not implemented") // TODO: Implement
 }
 
-func (b *Bot) SendSimilarProbByContent(pctnt string, uid string) error {
+func (b *Bot) ScheduleDailyProb(userID string, chanID string, time time.Time) error {
 	panic("not implemented") // TODO: Implement
 }
 
-func (b *Bot) ScheduleDailyProb(uid string, time time.Time) error {
+func (b *Bot) UnscheduleDailyProb(userID string, chanID string) error {
 	panic("not implemented") // TODO: Implement
 }
 
-func (b *Bot) UnscheduleDailyProb(uid string) error {
+func (b *Bot) ShowProbCategoryList(userID string, chanID string) error {
 	panic("not implemented") // TODO: Implement
 }
 
-func (b *Bot) ShowProbCategoryList(uid string) error {
-	panic("not implemented") // TODO: Implement
-}
-
-func (b *Bot) ShowHelpGuide(uid string) error {
+func (b *Bot) ShowHelpGuide(userID string, chanID string) error {
 	panic("not implemented") // TODO: Implement
 }

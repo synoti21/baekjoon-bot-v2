@@ -14,60 +14,44 @@ func (e *HTTPError) Error() string {
 	return fmt.Sprintf("%d: %s", e.StatusCode, e.Msg)
 }
 
-func NewBadRequestError(msg ...string) *HTTPError {
-	_msg := "Bad Request"
-	if len(msg) > 0 {
-		_msg = msg[0]
-	}
-
+func NewBadRequestError(traceback string) *HTTPError {
 	return &HTTPError{
 		StatusCode: http.StatusBadRequest,
-		Msg:        _msg,
+		Msg:        fmt.Sprintf("Bad Request: %s", traceback),
 	}
 }
 
-func NewUnauthorizedError(msg ...string) *HTTPError {
-	_msg := "Unauthorized"
-	if len(msg) > 0 {
-		_msg = msg[0]
-	}
-
+func NewUnauthorizedError(msg string) *HTTPError {
 	return &HTTPError{
 		StatusCode: http.StatusUnauthorized,
-		Msg:        _msg,
+		Msg:        fmt.Sprintf("Unauthorized: %s", msg),
 	}
 }
 
-func NewForbiddenError(msg ...string) *HTTPError {
-	_msg := "Forbidden"
-	if len(msg) > 0 {
-		_msg = msg[0]
-	}
-
+func NewForbiddenError(msg string) *HTTPError {
 	return &HTTPError{
 		StatusCode: http.StatusForbidden,
-		Msg:        _msg,
+		Msg:        fmt.Sprintf("Forbidden: %s", msg),
 	}
 }
 
-func NewNotFoundError(msg ...string) *HTTPError {
-	_msg := "Not Found"
-	if len(msg) > 0 {
-		_msg = msg[0]
-	}
+func NewNotFoundError(traceback string) *HTTPError {
 	return &HTTPError{
 		StatusCode: http.StatusNotFound,
-		Msg:        _msg,
+		Msg:        fmt.Sprintf("Not Found: %s", traceback),
 	}
 }
 
-func NewInternalServerError(msg ...string) *HTTPError {
-	_msg := "Internal Server Error"
-	if len(msg) > 0 {
-		_msg = msg[0]
-	}
+func NewInvalidSlashCommandError(traceback string) *HTTPError {
 	return &HTTPError{
 		StatusCode: http.StatusInternalServerError,
-		Msg:        _msg,
+		Msg:        fmt.Sprintf("Invalid Slash Command: %s", traceback),
+	}
+}
+
+func NewInternalServerError(traceback string) *HTTPError {
+	return &HTTPError{
+		StatusCode: http.StatusInternalServerError,
+		Msg:        fmt.Sprintf("Internal Server Error: %s", traceback),
 	}
 }

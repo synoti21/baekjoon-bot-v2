@@ -7,19 +7,17 @@ import (
 )
 
 type Interface interface {
-	Init() error
+	RegisterUser(userID, chanID string) error
+	WithdrawUser(userID, chanID string) error
 
-	RegisterUser(uid string) error
-	WithdrawUser(uid string) error
+	SendProbToUser(userID string) error
+	SendProbToUserByCategory(userID, chanID string, pc consts.ProbCategory) error
+	SendSimliarProbByPID(probID, userID, chanID string) error
+	SendSimilarProbByContent(probContent, userID, chanID string) error
 
-	SendProbToUser(uid string) error
-	SendProbToUserByCategory(uid string, pc consts.ProbCategory) error
-	SendSimliarProbByPID(pid string, uid string) error
-	SendSimilarProbByContent(pctnt string, uid string) error
+	ScheduleDailyProb(userID, chanID string, time time.Time) error
+	UnscheduleDailyProb(userID, chanID string) error
 
-	ScheduleDailyProb(uid string, time time.Time) error
-	UnscheduleDailyProb(uid string) error
-
-	ShowProbCategoryList(uid string) error
-	ShowHelpGuide(uid string) error
+	ShowProbCategoryList(userID, chanID string) error
+	ShowHelpGuide(userID, chanID string) error
 }

@@ -3,6 +3,7 @@ package common
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/synoti21/baekjoon-slack-bot/internal/bots"
 	"github.com/synoti21/baekjoon-slack-bot/internal/common/consts"
@@ -10,29 +11,44 @@ import (
 )
 
 type SlashCommandReq struct {
-	UserID   string
-	Command  string
-	Argument string
+	UserID    string
+	ChannelID string
+	Command   string
+	Argument  string
 }
 
 type SlashCommandHandler interface {
-	HandleSlashCommandReq(req *http.Request)
-	VerifySlashCommandReq(req *http.Request) error
+	HTTPServe()
+	HandleSlashCommandReq(r *http.Request) error
+	VerifySlashCommandReq(r *http.Request) error
 }
 
-func RunSlashCommand(b bots.Interface, r SlashCommandReq) error {
+func RunBotSlashCommand(b bots.Interface, r SlashCommandReq) error {
 	switch r.Command {
+	case "/register":
+		return b.RegisterUser(r.UserID, r.ChannelID)
 	case "/prob":
 		return b.SendProbToUser(r.UserID)
-	case "/register":
-		return b.RegisterUser(r.UserID)
 	case "/category":
 		categoryNum, err := strconv.Atoi(r.Argument)
 		if err != nil {
 			return err
 		}
-		return b.SendProbToUserByCategory(r.UserID, consts.ProbCategory(categoryNum))
+		if err := consts.ValidateProbCategory(categoryNum); err != nil {
+			return err
+		}
+		return b.SendProbToUserByCategory(r.UserID, r.ChannelID, consts.ProbCategory(categoryNum))
+	case "/daily":
+		t, err := time.Parse(r.Argument, "15 04")
+		if err != nil {
+			return errors.NewInvalidSlashCommandError("Invalid time format")
+		}
+		return b.ScheduleDailyProb(r.UserID, r.ChannelID, t)
+	case "/categorylist":
+		return b.ShowProbCategoryList(r.UserID, r.ChannelID)
+	case "/help":
+		return b.ShowHelpGuide(r.UserID, r.ChannelID)
 	default:
-		return errors.NewBadRequestError("Unknown Slash Command")
+		return errors.NewInvalidSlashCommandError("Unknown slash command")
 	}
 }

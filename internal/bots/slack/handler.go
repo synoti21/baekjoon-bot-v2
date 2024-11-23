@@ -2,7 +2,6 @@ package slack
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -37,54 +36,59 @@ func (h *slashCommandHandler) HTTPServe() {
 
 	r := gin.Default()
 	r.Use(errors.ErrorHandlingMiddleware())
-	r.POST("/receive", h.HandleSlashCommandReq)
+	r.POST("/receive", h.ginHandlerFunc)
 	r.Run(":" + port)
 }
 
-func (h *slashCommandHandler) HandleSlashCommandReq(r *http.Request) {
-	err := h.VerifySlashCommandReq(ctx)
+func (h *slashCommandHandler) ginHandlerFunc(c *gin.Context) {
+	err := h.HandleSlashCommandReq(c.Request)
 	if err != nil {
-		ctx.Error(err)
-		return
+		c.Error(err)
+	}
+	c.String(http.StatusOK, "Command executed successfully")
+}
+
+func (h *slashCommandHandler) HandleSlashCommandReq(r *http.Request) error {
+	err := h.VerifySlashCommandReq(r)
+	if err != nil {
+		return err
 	}
 
-	s, err := slack.SlashCommandParse(ctx.Request)
+	s, err := slack.SlashCommandParse(r)
 	if err != nil {
-		ctx.Error(err)
-		return
+		return errors.NewBadRequestError(err.Error())
 	}
 
-	err = common.RunSlashCommand(h.bot, common.SlashCommandReq{
+	err = common.RunBotSlashCommand(h.bot, common.SlashCommandReq{
 		UserID:   s.UserID,
 		Command:  s.Command,
 		Argument: s.Text,
 	})
 	if err != nil {
-		ctx.Error(err)
-		return
+		return err
 	}
-	ctx.String(http.StatusOK, fmt.Sprintf("Command %s executed successfully", s.Command))
+	return nil
 }
 
 func (h *slashCommandHandler) VerifySlashCommandReq(r *http.Request) error {
 	v, err := slack.NewSecretsVerifier(r.Header, h.signingSecret)
 	if err != nil {
-		return errors.NewBadRequestError("Invalid request header")
+		return errors.NewBadRequestError(err.Error())
 	}
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		return errors.NewInternalServerError("Could not read request body")
+		return errors.NewInternalServerError(err.Error())
 	}
 	r.Body = io.NopCloser(bytes.NewBuffer(body))
 
 	_, err = v.Write(body)
 	if err != nil {
-		return errors.NewUnauthorizedError("Invalid Slack signature")
+		return errors.NewUnauthorizedError(err.Error())
 	}
 
 	if err = v.Ensure(); err != nil {
-		return errors.NewUnauthorizedError("Invalid Slack signature")
+		return errors.NewUnauthorizedError(err.Error())
 	}
 	return nil
 }

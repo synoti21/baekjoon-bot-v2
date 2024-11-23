@@ -1,5 +1,7 @@
 package consts
 
+import "github.com/synoti21/baekjoon-slack-bot/internal/common/errors"
+
 type ProbCategory int
 
 const (
@@ -15,7 +17,9 @@ const (
 	ADVANCED
 )
 
-func ValidateProbCategory(pc ProbCategory) error {
-	//TODO: Implement
+func ValidateProbCategory(probCategory int) error {
+	if probCategory >= int(IMPLEMENTATION) && probCategory <= int(ADVANCED) {
+		return errors.NewInternalServerError("Invalid Category Type")
+	}
 	return nil
 }
