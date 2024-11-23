@@ -2,7 +2,11 @@ module github.com/synoti21/baekjoon-slack-bot
 
 go 1.21.10
 
-require github.com/gin-gonic/gin v1.10.0
+require (
+	github.com/cenkalti/backoff/v4 v4.3.0
+	github.com/gin-gonic/gin v1.10.0
+	go.uber.org/zap v1.27.0
+)
 
 require (
 	github.com/bytedance/sonic v1.12.4 // indirect
@@ -25,8 +29,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
-	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.27.0 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/arch v0.12.0 // indirect
 	golang.org/x/crypto v0.29.0 // indirect
 	golang.org/x/net v0.31.0 // indirect
