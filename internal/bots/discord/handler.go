@@ -10,6 +10,7 @@ import (
 	"github.com/synoti21/baekjoon-slack-bot/internal/bots"
 	"github.com/synoti21/baekjoon-slack-bot/internal/bots/common"
 	"github.com/synoti21/baekjoon-slack-bot/internal/common/consts"
+	"github.com/synoti21/baekjoon-slack-bot/internal/common/errors"
 )
 
 type slashCommandHandler struct {
@@ -17,7 +18,7 @@ type slashCommandHandler struct {
 }
 
 func NewRequestHandler() (common.SlashCommandHandler, error) {
-	sb := NewBot()
+	sb := NewDiscordBot()
 	return &slashCommandHandler{
 		bot: sb,
 	}, nil
@@ -25,46 +26,47 @@ func NewRequestHandler() (common.SlashCommandHandler, error) {
 
 func (h *slashCommandHandler) HTTPServe() {
 	r := gin.Default()
-	r.GET("/interactions", h.VerifyHTTPRequest)
+	r.Use(errors.ErrorHandlingMiddleware())
+	r.GET("/interactions", h.VerifySlashCommandReq)
 	r.Run()
 }
 
-func (h *slashCommandHandler) VerifyHTTPRequest(ctx *gin.Context) {
+func (h *slashCommandHandler) VerifySlashCommandReq(ctx *gin.Context) {
 	s, err := slack.SlashCommandParse(ctx.Request)
-	scReq := common.SlashCommandReq{
-		Command:  s.Command,
-		ChanID:   s.ChannelID,
-		UID:      s.UserID,
-		Category: s.Text,
-	}
-
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "Bad Request")
 		return
 	}
+
 	if !s.ValidateToken() {
 		ctx.String(http.StatusUnauthorized, "Unauthorized")
 		return
 	}
-	err = h.HandleCommandRequest(ctx, scReq)
+
+	err = h.HandleCommandReq(ctx, common.SlashCommandReq{
+		Command:  s.Command,
+		ChanID:   s.ChannelID,
+		UserID:   s.UserID,
+		Category: s.Text,
+	})
 	if err != nil {
 		ctx.String(http.StatusInternalServerError, "Not allowed slash commands")
 		return
 	}
 }
 
-func (h *slashCommandHandler) HandleCommandRequest(ctx *gin.Context, scReq common.SlashCommandReq) error {
+func (h *slashCommandHandler) HandleCommandReq(ctx *gin.Context, scReq common.SlashCommandReq) error {
 	switch scReq.Command {
 	case "/prob":
-		h.bot.SendProbToUser(scReq.UID)
+		h.bot.SendProbToUser(scReq.UserID)
 	case "/register":
-		h.bot.RegisterUser(scReq.UID)
+		h.bot.RegisterUser(scReq.UserID)
 	case "/category":
 		categoryNum, err := strconv.Atoi(scReq.Category)
 		if err != nil {
 			return err
 		}
-		h.bot.SendProbToUserByCategory(scReq.UID, consts.ProbCategory(categoryNum))
+		h.bot.SendProbToUserByCategory(scReq.UserID, consts.ProbCategory(categoryNum))
 	}
-	panic("not implemented") // TODO: Implement
+	return nil
 }

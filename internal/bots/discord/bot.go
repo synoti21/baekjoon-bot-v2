@@ -14,7 +14,7 @@ type Bot struct {
 
 var _ bots.Interface = (*Bot)(nil)
 
-func NewBot() bots.Interface {
+func NewDiscordBot() bots.Interface {
 	t := os.Getenv("DISCORD_BOT_TOKEN")
 	if t == "" {
 		panic("DISCORD_BOT_TOKEN is not set")

@@ -14,7 +14,7 @@ type Bot struct {
 
 var _ bots.Interface = (*Bot)(nil)
 
-func NewBot() bots.Interface {
+func NewSlackBot() bots.Interface {
 	t, err := utils.GetVarFromEnv("SLACK_BOT_TOKEN")
 	if err != nil {
 		return nil
