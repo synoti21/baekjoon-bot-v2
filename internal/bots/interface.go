@@ -1,23 +1,22 @@
 package bots
 
 import (
-	"time"
-
-	"github.com/synoti21/baekjoon-slack-bot/internal/common/consts"
+	"github.com/synoti21/baekjoon-slack-bot/common/errors"
+	"github.com/synoti21/baekjoon-slack-bot/internal/db/schema"
 )
 
 type Interface interface {
-	RegisterUser(userID, chanID string) error
-	WithdrawUser(userID, chanID string) error
+	RegisterUser(userID, bojID string) *errors.HTTPError
+	WithdrawUser(userID string) *errors.HTTPError
 
-	SendProbToUser(userID string) error
-	SendProbToUserByCategory(userID, chanID string, pc consts.ProbCategory) error
-	SendSimliarProbByPID(probID, userID, chanID string) error
-	SendSimilarProbByContent(probContent, userID, chanID string) error
+	GetRecommendedProb(userID string) (*schema.BaekjoonProb, *errors.HTTPError)
+	GetRecommendedProbByCategory(userID string, categoryType string) (*schema.BaekjoonProb, *errors.HTTPError)
+	GetSimilarProbByID(probID, userID string) (*schema.BaekjoonProb, *errors.HTTPError)
+	GetSimilarProbByContent(probContent, userID string) (*schema.BaekjoonProb, *errors.HTTPError)
 
-	ScheduleDailyProb(userID, chanID string, time time.Time) error
-	UnscheduleDailyProb(userID, chanID string) error
+	ScheduleDailyProb(userID string, time string) *errors.HTTPError
+	UnscheduleDailyProb(userID string) *errors.HTTPError
 
-	ShowProbCategoryList(userID, chanID string) error
-	ShowHelpGuide(userID, chanID string) error
+	ShowProbCategoryList(userID string) *errors.HTTPError
+	ShowHelpGuide(userID string) *errors.HTTPError
 }

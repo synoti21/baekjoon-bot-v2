@@ -1,21 +1,25 @@
 package db
 
-import "time"
+import (
+	"time"
+
+	"github.com/synoti21/baekjoon-slack-bot/internal/db/schema"
+)
 
 type Interface interface {
-	AddUser(userID, bojID string)
-	DeleteUser(userID string)
-	ModifyUserBJID(userID, BJID string)
+	AddUser(userID, bojID string) error
+	DeleteUser(userID string) error
+	ModifyUserBJID(userID, BJID string) error
 
-	UpsertDailyProbTime(userID string, time time.Time)
-	UnsetDailyProbTime(userID string)
+	UpsertDailyProbTime(userID string, time time.Time) error
+	UnsetDailyProbTime(userID string) error
 
 	FindUserWithDiscordID(discordID string)
 	FindUserWithSlackID(slackID string)
 	FindUsersWithDailyProbTime(time time.Time)
 	FindAllUser()
 
-	FindProbWithID(probID string)
+	FindProbWithID(probID int) (*schema.BaekjoonProb, error)
 
 	AddFeedback(content string)
 }

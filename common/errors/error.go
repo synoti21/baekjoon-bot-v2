@@ -14,6 +14,10 @@ func (e *HTTPError) Error() string {
 	return fmt.Sprintf("%d: %s", e.StatusCode, e.Msg)
 }
 
+func (e *HTTPError) GetStatusCode() int {
+	return e.StatusCode
+}
+
 func NewBadRequestError(traceback string) *HTTPError {
 	return &HTTPError{
 		StatusCode: http.StatusBadRequest,

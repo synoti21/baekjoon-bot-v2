@@ -1,6 +1,6 @@
 package consts
 
-import "github.com/synoti21/baekjoon-slack-bot/internal/common/errors"
+import "github.com/synoti21/baekjoon-slack-bot/common/errors"
 
 type ProbCategory int
 
