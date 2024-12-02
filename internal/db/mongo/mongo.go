@@ -7,16 +7,13 @@ import (
 	"github.com/synoti21/baekjoon-slack-bot/internal/db/schema"
 )
 
-type Mongo interface {
-}
-
 type mongo struct {
 	endpoint string
 }
 
 var _ db.Interface = (*mongo)(nil)
 
-func New() Mongo {
+func New() db.Interface {
 	return &mongo{
 		endpoint: "",
 	}
