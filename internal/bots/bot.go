@@ -14,6 +14,13 @@ type Bot struct {
 
 var _ Interface = (*Bot)(nil)
 
+func New(_db db.Interface, _recAPI client.ProbRecommandAPI) Interface {
+	return &Bot{
+		db:     _db,
+		recAPI: _recAPI,
+	}
+}
+
 func (b *Bot) RegisterUser(userID string, bojID string) *errors.HTTPError {
 	err := b.db.AddUser(userID, bojID)
 	if err != nil {

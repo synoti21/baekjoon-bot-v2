@@ -23,7 +23,7 @@ type SlashCommandHandler struct {
 func New(cfg *config.HandlerConfig, b bots.Interface) (*SlashCommandHandler, error) {
 	var adapter adapters.Interface
 
-	switch cfg.Platform() {
+	switch cfg.Platform {
 	case config.Slack:
 		adapter = &slack.Adapter{}
 	case config.Discord:
