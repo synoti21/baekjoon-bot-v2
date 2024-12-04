@@ -11,7 +11,7 @@ type Interface interface {
 	DeleteUser(userID string) error
 	ModifyUserBJID(userID, BJID string) error
 
-	UpsertDailyProbTime(userID string, time time.Time) error
+	SetDailyProbTime(userID string, time time.Time) error
 	UnsetDailyProbTime(userID string) error
 
 	FindUserWithDiscordID(discordID string)

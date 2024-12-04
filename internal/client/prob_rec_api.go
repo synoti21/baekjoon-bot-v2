@@ -6,53 +6,53 @@ import (
 	"github.com/synoti21/baekjoon-slack-bot/common/consts"
 )
 
-type ProbRecommandAPI interface {
-	GetProbsByUserID(uid string, probCnt int) (*ProbRecommandAPIResponse, error)
-	GetProbsByCategory(category consts.ProbCategory) (*ProbRecommandAPIResponse, error)
-	GetSimilarProbsByProbIDs(pid string) (*ProbRecommandAPIResponse, error)
-	GetSimilarProbsByProbContents(pctnt string) (*ProbRecommandAPIResponse, error)
+type ProbRecommendAPI interface {
+	GetProbsByUserID(uid string, probCnt int) (*ProbRecommendAPIResponse, error)
+	GetProbsByCategory(category consts.ProbCategory) (*ProbRecommendAPIResponse, error)
+	GetSimilarProbsByProbIDs(pid int) (*ProbRecommendAPIResponse, error)
+	GetSimilarProbsByProbContents(pctnt string) (*ProbRecommendAPIResponse, error)
 }
 
-type probRecommandAPI struct {
+type probRecommendAPI struct {
 	endpoint string
 }
 
-type ProbRecommandAPIRequest struct {
+type ProbRecommendAPIRequest struct {
 	UserIDs  []string            `json:"user_id_list"`
 	Category consts.ProbCategory `json:"category"`
 	ProbNum  int                 `json:"problem_num"`
 }
 
-type ProbRecommandAPIResponse struct {
+type ProbRecommendAPIResponse struct {
 	ProbIDsByUserID        map[string][]int
 	SimilarProbIDsByProbID map[string][]int
 	ProbIDsByCategory      map[consts.ProbCategory][]int
 }
 
-var _ ProbRecommandAPI = (*probRecommandAPI)(nil)
+var _ ProbRecommendAPI = (*probRecommendAPI)(nil)
 
-func NewProbRecommandSvc() (ProbRecommandAPI, error) {
+func NewProbRecommandSvc() (ProbRecommendAPI, error) {
 	e := os.Getenv("REC_SVC_ENDPOINT")
 	if e == "" {
 		panic("REC_SVC_ENDPOINT not set.")
 	}
-	return &probRecommandAPI{
+	return &probRecommendAPI{
 		endpoint: e,
 	}, nil
 }
 
-func (p *probRecommandAPI) GetProbsByUserID(uid string, probCnt int) (*ProbRecommandAPIResponse, error) {
+func (p *probRecommendAPI) GetProbsByUserID(uid string, probCnt int) (*ProbRecommendAPIResponse, error) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (p *probRecommandAPI) GetProbsByCategory(category consts.ProbCategory) (*ProbRecommandAPIResponse, error) {
+func (p *probRecommendAPI) GetProbsByCategory(category consts.ProbCategory) (*ProbRecommendAPIResponse, error) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (p *probRecommandAPI) GetSimilarProbsByProbIDs(pid string) (*ProbRecommandAPIResponse, error) {
+func (p *probRecommendAPI) GetSimilarProbsByProbIDs(pid int) (*ProbRecommendAPIResponse, error) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (p *probRecommandAPI) GetSimilarProbsByProbContents(pctnt string) (*ProbRecommandAPIResponse, error) {
+func (p *probRecommendAPI) GetSimilarProbsByProbContents(pctnt string) (*ProbRecommendAPIResponse, error) {
 	panic("not implemented") // TODO: Implement
 }

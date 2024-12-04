@@ -13,7 +13,7 @@ func ErrorHandlingMiddleware() gin.HandlerFunc {
 		if len(ctx.Errors) > 0 {
 			for _, e := range ctx.Errors {
 				if httpErr, ok := e.Err.(*errors.HTTPError); ok {
-					ctx.String(httpErr.StatusCode, httpErr.Msg)
+					ctx.String(httpErr.GetStatusCode(), httpErr.GetErrorMsg())
 					return
 				}
 			}

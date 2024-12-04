@@ -1,6 +1,7 @@
 package schema
 
 type User struct {
-	DiscordID string
-	BojID     string
+	DiscordID  string
+	SlackID    string
+	BaekjoonID string
 }

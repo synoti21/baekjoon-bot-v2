@@ -8,8 +8,8 @@ import (
 
 const (
 	initialInterval = 10 * time.Second
-	maxInterval     = 2 * time.Minute
-	maxElapsedTime  = 5 * time.Minute
+	maxInterval     = 5 * time.Second
+	maxElapsedTime  = 1 * time.Minute
 )
 
 func NonRetryableError(err error) *backoff.PermanentError {

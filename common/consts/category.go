@@ -1,6 +1,8 @@
 package consts
 
-import "github.com/synoti21/baekjoon-slack-bot/common/errors"
+import (
+	"strconv"
+)
 
 type ProbCategory int
 
@@ -12,14 +14,19 @@ const (
 	TRAVERSE
 	STRING
 	MATH
-	OPTIMIZATION
+	OPTIMIZATIO9
 	GEOGRAPHY
 	ADVANCED
 )
 
-func ValidateProbCategory(probCategory int) error {
-	if probCategory >= int(IMPLEMENTATION) && probCategory <= int(ADVANCED) {
-		return errors.NewInternalServerError("Invalid Category Type")
+func ValidateProbCategory(arg string) (ProbCategory, error) {
+	probCategory, err := strconv.ParseInt(arg, 0, 64)
+	if err != nil {
+		return -1, err
 	}
-	return nil
+
+	if int(probCategory) >= int(IMPLEMENTATION) && int(probCategory) <= int(ADVANCED) {
+		return -1, err
+	}
+	return ProbCategory(probCategory), nil
 }

@@ -16,7 +16,4 @@ type Interface interface {
 
 	ScheduleDailyProb(userID string, time string) *errors.HTTPError
 	UnscheduleDailyProb(userID string) *errors.HTTPError
-
-	ShowProbCategoryList(userID string) *errors.HTTPError
-	ShowHelpGuide(userID string) *errors.HTTPError
 }

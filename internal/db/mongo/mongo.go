@@ -3,6 +3,7 @@ package mongo
 import (
 	"time"
 
+	"github.com/synoti21/baekjoon-slack-bot/config"
 	"github.com/synoti21/baekjoon-slack-bot/internal/db"
 	"github.com/synoti21/baekjoon-slack-bot/internal/db/schema"
 )
@@ -13,7 +14,7 @@ type mongo struct {
 
 var _ db.Interface = (*mongo)(nil)
 
-func New() db.Interface {
+func New(cfg *config.DatabaseClientConfig) db.Interface {
 	return &mongo{
 		endpoint: "",
 	}
@@ -31,7 +32,7 @@ func (m *mongo) ModifyUserBJID(userID string, BJID string) error {
 	panic("not implemented") // TODO: Implement
 }
 
-func (m *mongo) UpsertDailyProbTime(userID string, time time.Time) error {
+func (m *mongo) SetDailyProbTime(userID string, time time.Time) error {
 	panic("not implemented") // TODO: Implement
 }
 

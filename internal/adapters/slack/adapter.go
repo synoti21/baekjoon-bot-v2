@@ -5,8 +5,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/slack-go/slack"
+	"github.com/synoti21/baekjoon-slack-bot/common/consts"
 	"github.com/synoti21/baekjoon-slack-bot/common/errors"
 	"github.com/synoti21/baekjoon-slack-bot/internal/adapters"
 	"github.com/synoti21/baekjoon-slack-bot/internal/db/schema"
@@ -16,7 +16,7 @@ type Adapter struct{}
 
 var _ adapters.Interface = (*Adapter)(nil)
 
-func (a *Adapter) VerifyRequest(r *http.Request, secret string) error {
+func (a *Adapter) VerifyRequest(r *http.Request, secret string) *errors.HTTPError {
 	v, err := slack.NewSecretsVerifier(r.Header, secret)
 	if err != nil {
 		return errors.NewBadRequestError(err.Error())
@@ -39,14 +39,32 @@ func (a *Adapter) VerifyRequest(r *http.Request, secret string) error {
 	return nil
 }
 
-func (a *Adapter) ParseSlashCommand(r *http.Request) (*adapters.SlashCommandRequest, error) {
+func (a *Adapter) ParseSlashCommand(r *http.Request) (*adapters.SlashCommandRequest, *errors.HTTPError) {
+	s, err := slack.SlashCommandParse(r)
+	if err != nil {
+		return nil, errors.NewInternalServerError(err.Error())
+	}
+
+	sc, ok := consts.ValidateSlashCommand(s.Command)
+	if !ok {
+		return nil, errors.NewBadRequestError("Invalid Slack command")
+	}
+
+	return &adapters.SlashCommandRequest{
+		Command:   sc,
+		ChannelID: s.ChannelID,
+		UserID:    s.UserID,
+		Arg:       s.Text,
+	}, nil
+}
+func (a *Adapter) CreateCategoryListMessage() (interface{}, *errors.HTTPError) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (a *Adapter) CreateMessage(prob *schema.BaekjoonProb) (interface{}, error) {
+func (a *Adapter) CreateHelpGuideMessage() (interface{}, *errors.HTTPError) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (a *Adapter) SendResponse(ctx *gin.Context, response interface{}) error {
+func (a *Adapter) CreateProblemMessage(prob *schema.BaekjoonProb) (interface{}, *errors.HTTPError) {
 	panic("not implemented") // TODO: Implement
 }

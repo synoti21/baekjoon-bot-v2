@@ -1,6 +1,11 @@
 package bots
 
 import (
+	"fmt"
+	"strconv"
+	"time"
+
+	"github.com/synoti21/baekjoon-slack-bot/common/consts"
 	"github.com/synoti21/baekjoon-slack-bot/common/errors"
 	"github.com/synoti21/baekjoon-slack-bot/internal/client"
 	"github.com/synoti21/baekjoon-slack-bot/internal/db"
@@ -9,12 +14,12 @@ import (
 
 type Bot struct {
 	db     db.Interface
-	recAPI client.ProbRecommandAPI
+	recAPI client.ProbRecommendAPI
 }
 
 var _ Interface = (*Bot)(nil)
 
-func New(_db db.Interface, _recAPI client.ProbRecommandAPI) Interface {
+func New(_db db.Interface, _recAPI client.ProbRecommendAPI) Interface {
 	return &Bot{
 		db:     _db,
 		recAPI: _recAPI,
@@ -26,6 +31,7 @@ func (b *Bot) RegisterUser(userID string, bojID string) *errors.HTTPError {
 	if err != nil {
 		return errors.NewInternalServerError(err.Error())
 	}
+
 	return nil
 }
 
@@ -34,50 +40,99 @@ func (b *Bot) WithdrawUser(userID string) *errors.HTTPError {
 	if err != nil {
 		return errors.NewInternalServerError(err.Error())
 	}
+
 	return nil
 }
 
 func (b *Bot) GetRecommendedProb(userID string) (*schema.BaekjoonProb, *errors.HTTPError) {
-	p, err := b.recAPI.GetProbsByUserID(userID, 1)
+	resp, err := b.recAPI.GetProbsByUserID(userID, 1)
 	if err != nil {
 		return nil, errors.NewInternalServerError(err.Error())
 	}
-	pid := p.ProbIDsByUserID[userID]
-	if len(pid) != 1 {
-		return nil, errors.NewInternalServerError("Invalid response from prob recommand service")
+
+	pid, ok := resp.ProbIDsByUserID[userID]
+	if len(pid) != 1 || !ok {
+		return nil, errors.NewInternalServerError(fmt.Sprintf("Invalid baekjoon problem response: %v", resp.ProbIDsByUserID))
 	}
 
 	prob, err := b.db.FindProbWithID(pid[0])
 	if err != nil {
 		return nil, errors.NewInternalServerError(err.Error())
 	}
+
 	return prob, nil
 }
 
 func (b *Bot) GetRecommendedProbByCategory(userID string, categoryType string) (*schema.BaekjoonProb, *errors.HTTPError) {
-	panic("not implemented") // TODO: Implement
+	pc, err := consts.ValidateProbCategory(categoryType)
+	if err != nil {
+		return nil, errors.NewBadRequestError(err.Error())
+	}
+	resp, err := b.recAPI.GetProbsByCategory(pc)
+	if err != nil {
+		return nil, errors.NewInternalServerError(err.Error())
+	}
+
+	pid, ok := resp.ProbIDsByCategory[pc]
+	if len(pid) != 1 || !ok {
+		return nil, errors.NewInternalServerError(fmt.Sprintf("Invalid baekjoon prob response: %v", resp.ProbIDsByCategory))
+	}
+
+	prob, err := b.db.FindProbWithID(pid[0])
+	if err != nil {
+		return nil, errors.NewInternalServerError(err.Error())
+	}
+
+	return prob, nil
 }
 
 func (b *Bot) GetSimilarProbByID(probID string, userID string) (*schema.BaekjoonProb, *errors.HTTPError) {
-	panic("not implemented") // TODO: Implement
+	pid, err := strconv.ParseInt(probID, 0, 64)
+	if err != nil {
+		return nil, errors.NewBadRequestError("problem ID should be number")
+	}
+
+	resp, err := b.recAPI.GetSimilarProbsByProbIDs(int(pid))
+	if err != nil {
+		return nil, errors.NewInternalServerError(err.Error())
+	}
+
+	pidResp, ok := resp.SimilarProbIDsByProbID[probID]
+	if len(pidResp) != 1 || !ok {
+		return nil, errors.NewInternalServerError(fmt.Sprintf("Invalid baekjoon prob response: %v", resp.ProbIDsByCategory))
+	}
+
+	prob, err := b.db.FindProbWithID(pidResp[0])
+	if err != nil {
+		return nil, errors.NewInternalServerError(err.Error())
+	}
+
+	return prob, nil
 }
 
 func (b *Bot) GetSimilarProbByContent(probContent string, userID string) (*schema.BaekjoonProb, *errors.HTTPError) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (b *Bot) ScheduleDailyProb(userID string, time string) *errors.HTTPError {
-	panic("not implemented") // TODO: Implement
+func (b *Bot) ScheduleDailyProb(userID string, _time string) *errors.HTTPError {
+	t, err := time.Parse("15 04", _time)
+	if err != nil {
+		return errors.NewBadRequestError(err.Error())
+	}
+
+	err = b.db.SetDailyProbTime(userID, t)
+	if err != nil {
+		return errors.NewInternalServerError(err.Error())
+	}
+
+	return nil
 }
 
 func (b *Bot) UnscheduleDailyProb(userID string) *errors.HTTPError {
-	panic("not implemented") // TODO: Implement
-}
+	err := b.db.UnsetDailyProbTime(userID)
+	if err != nil {
+		return errors.NewInternalServerError(err.Error())
+	}
 
-func (b *Bot) ShowProbCategoryList(userID string) *errors.HTTPError {
-	panic("not implemented") // TODO: Implement
-}
-
-func (b *Bot) ShowHelpGuide(userID string) *errors.HTTPError {
-	panic("not implemented") // TODO: Implement
+	return nil
 }

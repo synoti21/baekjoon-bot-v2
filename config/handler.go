@@ -16,7 +16,7 @@ type HandlerConfig struct {
 	IdleTimeout time.Duration
 }
 
-func New(platform Platform, botmode BotMode, port string) *HandlerConfig {
+func NewHandlerConfig(platform Platform, botmode BotMode, port string) *HandlerConfig {
 	return &HandlerConfig{
 		Port:        port,
 		Platform:    platform,
@@ -32,6 +32,6 @@ func (c *HandlerConfig) RouteEndpoint() string {
 	case Discord:
 		return "/interaction"
 	default:
-		return "/"
+		return "/default"
 	}
 }

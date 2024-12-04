@@ -17,16 +17,17 @@ func (cg *CommandGroup) RegisterApp(app *cli.App) {
 	app.Commands = append(app.Commands,
 		&cli.Command{
 			Name:        "start",
-			Description: "This command fetches all metrics via Datadog API and categorizes with teams",
+			Description: "Starts the Baekjoon bot server",
 			Action:      cg.Start,
 			Flags: []cli.Flag{
 				&flagPort,
+				&flagBotMode,
 				&flagPlatform,
 			},
 		},
 		&cli.Command{
 			Name:        "daily",
-			Description: "This command generates weekly usage data of custom metrics by team",
+			Description: "Schedules daily problem recommendations",
 			Action:      cg.Daily,
 			Flags: []cli.Flag{
 				&flagPlatform,
@@ -42,40 +43,46 @@ func (cg *CommandGroup) Start(cliCtx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-
 	port, err := parsePortFromCtx(cliCtx)
 	if err != nil {
 		return err
 	}
-
 	mode, err := parseBotModeFromCtx(cliCtx)
 	if err != nil {
 		return err
 	}
 
-	cfg := config.New(platform, mode, port)
+	hcfg := config.NewHandlerConfig(platform, mode, port)
+	dcfg := config.NewDatabaseClientConfig()
+	if err = dcfg.Validate(); err != nil {
+		return err
+	}
 
-	switch cfg.Database() {
-	case config.Mongo:
-		db = mongo.New()
+	switch dcfg.Type {
+	case config.DatabaseTypeMongoDB:
+		db = mongo.New(dcfg)
+	case config.DatabaseTypeMySQL:
+		return errors.NewInternalServerError("MySQL not supported in this version")
+	case config.DatabaseTypePostgres:
+		return errors.NewInternalServerError("Postgres not supported in this version")
+	case config.DatabaseTypeDryRun:
+		return errors.NewInternalServerError("DryRun not supported in this version")
 	default:
 		return errors.NewInternalServerError("Invalid database mode")
 	}
 
-	api, err := client.NewProbRecommandSvc()
+	recAPI, err := client.NewProbRecommandSvc()
 	if err != nil {
 		return err
 	}
 
-	bot := bots.New(db, api)
+	bot := bots.New(db, recAPI)
 
-	h, err := handlers.New(cfg, bot)
+	h, err := handlers.New(hcfg, bot)
 	if err != nil {
 		return err
 	}
-
 	h.Run()
-
 	return nil
 }
 

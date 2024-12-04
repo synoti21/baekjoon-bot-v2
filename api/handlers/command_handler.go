@@ -1,8 +1,9 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
-	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/synoti21/baekjoon-slack-bot/api/middlewares"
@@ -39,32 +40,32 @@ func New(cfg *config.HandlerConfig, b bots.Interface) (*SlashCommandHandler, err
 	}, nil
 }
 
-func (h *SlashCommandHandler) Run() {
-	port := os.Getenv("SLACK_PORT")
-	if port == "" {
-		port = "8080"
+func (h *SlashCommandHandler) Run() error {
+	port := h.config.Port
+	if _, err := strconv.ParseInt(port, 0, 64); err != nil {
+		return errors.NewBadRequestError(fmt.Sprintf("Invalid config port: %v", port))
 	}
-
 	r := gin.Default()
 	r.Use(middlewares.VerifyRequestMiddleware(h.adapter, h.config.Secret))
 	r.Use(middlewares.ErrorHandlingMiddleware())
 	r.POST(h.config.RouteEndpoint(), h.SlashCommandHandlerFunc())
 	r.Run(":" + port)
+	return nil
 }
 
 func (h *SlashCommandHandler) SlashCommandHandlerFunc() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		cmd, err := h.adapter.ParseSlashCommand(ctx.Request)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
+			ctx.AbortWithError(err.GetStatusCode(), err)
 			return
 		}
 
-		resp, err := RunBotSlashCommand(h.bot, cmd)
+		resp, err := h.RunBotSlashCommand(cmd)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
+			ctx.AbortWithError(err.GetStatusCode(), err)
 			return
 		}
-		h.adapter.SendResponse(ctx, resp)
+		ctx.JSON(http.StatusOK, resp)
 	}
 }

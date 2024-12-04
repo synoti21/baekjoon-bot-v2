@@ -9,18 +9,16 @@ import (
 )
 
 func main() {
-	var (
-		app = &cli.App{
-			Name:        "baekjoon-bot",
-			Description: "Baekjoon Bot for recommanding algorithm problems",
-			Usage:       "baekjoon-bot <command> [OPTIONS]",
-			Version:     "1.0.0",
-		}
-		sugar    = logger.GetLogger().Sugar()
-		cmdGroup = new(cmd.CommandGroup)
-	)
+	app := &cli.App{
+		Name:        "baekjoon-bot",
+		Description: "Baekjoon Bot for recommanding algorithm problems",
+		Usage:       "baekjoon-bot <command> [OPTIONS]",
+		Version:     "1.0.0",
+	}
+	cmdGroup := new(cmd.CommandGroup)
 	cmdGroup.RegisterApp(app)
 
+	sugar := logger.GetLogger().Sugar()
 	if err := app.Run(os.Args); err != nil {
 		sugar.Fatal(err)
 	}

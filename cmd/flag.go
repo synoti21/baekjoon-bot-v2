@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/synoti21/baekjoon-slack-bot/common/errors"
@@ -37,7 +36,7 @@ var (
 func parsePlatformFromCtx(cliCtx *cli.Context) (config.Platform, error) {
 	platform := cliCtx.String(flagPlatformName)
 	if platform == "" {
-		return "", fmt.Errorf("no platform inputted")
+		return "", errors.NewBadRequestError("no platform inputted")
 	}
 	switch platform {
 	case "slack":
@@ -52,7 +51,7 @@ func parsePlatformFromCtx(cliCtx *cli.Context) (config.Platform, error) {
 func parsePortFromCtx(cliCtx *cli.Context) (string, error) {
 	port := cliCtx.String(flagPortName)
 	if port == "" {
-		return "", errors.NewBadRequestError("No port inputted")
+		return "8080", nil
 	}
 
 	if _, err := strconv.ParseInt(port, 0, 64); err != nil {
