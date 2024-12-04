@@ -48,6 +48,7 @@ func (h *SlashCommandHandler) Run() error {
 	r := gin.Default()
 	r.Use(middlewares.VerifyRequestMiddleware(h.adapter, h.config.Secret))
 	r.Use(middlewares.ErrorHandlingMiddleware())
+	r.GET("/healthz", h.healthz())
 	r.POST(h.config.RouteEndpoint(), h.SlashCommandHandlerFunc())
 	r.Run(":" + port)
 	return nil
