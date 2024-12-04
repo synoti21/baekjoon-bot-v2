@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "baekjoon-slack-bot.fullname" . }}-test-connection"
+  name: "{{ include "baekjoon-bot-v2.fullname" . }}-test-connection"
   labels:
-    {{- include "baekjoon-slack-bot.labels" . | nindent 4 }}
+    {{- include "baekjoon-bot-v2.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": test
 spec:
@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "baekjoon-slack-bot.fullname" . }}:{{ .Values.service.port }}']
+      args: ['{{ include "baekjoon-bot-v2.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never

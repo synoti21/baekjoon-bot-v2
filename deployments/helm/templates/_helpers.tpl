@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "baekjoon-slack-bot.name" -}}
+{{- define "baekjoon-bot-v2.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "baekjoon-slack-bot.fullname" -}}
+{{- define "baekjoon-bot-v2.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "baekjoon-slack-bot.chart" -}}
+{{- define "baekjoon-bot-v2.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "baekjoon-slack-bot.labels" -}}
-helm.sh/chart: {{ include "baekjoon-slack-bot.chart" . }}
-{{ include "baekjoon-slack-bot.selectorLabels" . }}
+{{- define "baekjoon-bot-v2.labels" -}}
+helm.sh/chart: {{ include "baekjoon-bot-v2.chart" . }}
+{{ include "baekjoon-bot-v2.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "baekjoon-slack-bot.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "baekjoon-slack-bot.name" . }}
+{{- define "baekjoon-bot-v2.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "baekjoon-bot-v2.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "baekjoon-slack-bot.serviceAccountName" -}}
+{{- define "baekjoon-bot-v2.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "baekjoon-slack-bot.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "baekjoon-bot-v2.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
