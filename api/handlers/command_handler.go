@@ -15,6 +15,7 @@ import (
 	"github.com/synoti21/baekjoon-slack-bot/internal/bots"
 )
 
+// SlashCommandHandler handles the slash command HTTP request, and executes the corresponding bot command.
 type SlashCommandHandler struct {
 	config  *config.HandlerConfig
 	bot     bots.Interface
@@ -24,6 +25,7 @@ type SlashCommandHandler struct {
 func New(cfg *config.HandlerConfig, b bots.Interface) (*SlashCommandHandler, error) {
 	var adapter adapters.Interface
 
+	// Select the adapter depending on the what platforms we are hosting.
 	switch cfg.Platform {
 	case config.Slack:
 		adapter = &slack.Adapter{}
@@ -46,14 +48,18 @@ func (h *SlashCommandHandler) Run() error {
 		return errors.NewBadRequestError(fmt.Sprintf("Invalid config port: %v", port))
 	}
 	r := gin.Default()
+
 	r.Use(middlewares.VerifyRequestMiddleware(h.adapter, h.config.Secret))
 	r.Use(middlewares.ErrorHandlingMiddleware())
+
 	r.GET("/healthz", h.healthz())
 	r.POST(h.config.RouteEndpoint(), h.SlashCommandHandlerFunc())
+
 	r.Run(":" + port)
 	return nil
 }
 
+// SlashCommandHandlerFunc is a handler function used by gin, to activate the slash command handler logics
 func (h *SlashCommandHandler) SlashCommandHandlerFunc() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		cmd, err := h.adapter.ParseSlashCommand(ctx.Request)
@@ -67,6 +73,7 @@ func (h *SlashCommandHandler) SlashCommandHandlerFunc() gin.HandlerFunc {
 			ctx.AbortWithError(err.GetStatusCode(), err)
 			return
 		}
+		// Return the response to the user
 		ctx.JSON(http.StatusOK, resp)
 	}
 }

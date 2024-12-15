@@ -9,6 +9,9 @@ import (
 
 type DatabaseType string
 
+// Set the database type depending on what you prefer to use.
+// The default database is MySQL.
+// You should define the schema if you want to change the database type, and implement the DB client based on the `db/interface.go`
 const (
 	DatabaseTypePostgres DatabaseType = "postgres"
 	DatabaseTypeMySQL    DatabaseType = "mysql"
@@ -24,6 +27,7 @@ type DatabaseClientConfig struct {
 	Password string       // Password for database authentication
 	DBName   string       // Name of the specific database to use
 	SSLMode  string       // SSL mode (e.g., "disable", "require")
+	Platform Platform
 }
 
 func NewDatabaseClientConfig() *DatabaseClientConfig {

@@ -20,6 +20,10 @@ func (a *Adapter) ParseSlashCommand(r *http.Request) (*adapters.SlashCommandRequ
 	panic("not implemented") // TODO: Implement
 }
 
+func (a *Adapter) CreateTextMessage(text string) (interface{}, *errors.HTTPError) {
+	panic("not implemented") // TODO: Implement
+}
+
 func (a *Adapter) CreateCategoryListMessage() (interface{}, *errors.HTTPError) {
 	panic("not implemented") // TODO: Implement
 }

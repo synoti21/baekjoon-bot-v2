@@ -25,6 +25,9 @@ func NewHandlerConfig(platform Platform, botmode BotMode, port string) *HandlerC
 	}
 }
 
+// RouteEndpoint returns endpoint that gets the slash command request, depending on the platform
+// Slack receives the slash command request from '/receive'
+// Discord receives the slash command request from '/interaction'
 func (c *HandlerConfig) RouteEndpoint() string {
 	switch c.Platform {
 	case Slack:

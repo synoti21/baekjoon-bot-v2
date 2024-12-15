@@ -57,6 +57,11 @@ func (a *Adapter) ParseSlashCommand(r *http.Request) (*adapters.SlashCommandRequ
 		Arg:       s.Text,
 	}, nil
 }
+
+func (a *Adapter) CreateTextMessage(text string) (interface{}, *errors.HTTPError) {
+	panic("not implemented") // TODO: Implement
+}
+
 func (a *Adapter) CreateCategoryListMessage() (interface{}, *errors.HTTPError) {
 	panic("not implemented") // TODO: Implement
 }

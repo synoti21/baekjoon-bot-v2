@@ -8,17 +8,38 @@ import (
 	"github.com/synoti21/baekjoon-slack-bot/internal/db/schema"
 )
 
-type Interface interface {
-	VerifyRequest(r *http.Request, signature string) *errors.HTTPError
-	ParseSlashCommand(r *http.Request) (*SlashCommandRequest, *errors.HTTPError)
-	CreateProblemMessage(prob *schema.BaekjoonProb) (interface{}, *errors.HTTPError)
-	CreateCategoryListMessage() (interface{}, *errors.HTTPError)
-	CreateHelpGuideMessage() (interface{}, *errors.HTTPError)
-}
-
+// SlashCommnadRequest is a struct to handle slash command request without considering the platforms.
+// Request JSON of slash command request differs by platform, so we use this struct to create a common
+// instance of slash command request
 type SlashCommandRequest struct {
 	UserID    string
 	ChannelID string
 	Command   consts.SlashCommand
-	Arg       string
+	// Arg receives an extra argument that user inputs when using a slash command.
+	// Arg can be userID (/register), category number (/category) or other else.
+	Arg string
+}
+
+// Interface is an interface of adapter, used to perform common logics in various platform like Slack, Discord.
+// Since logics of Baekjoon-bot do not significantly differ by platforms, we use adapters to adaptively implement logics.
+// It will be implemented with real logics depending on the platform we use.
+// For example, Slack will verify slash commnad request with signature, while Discord verifies with token.
+type Interface interface {
+	// VerifyRequest verfies the slash command request from platforms, by verifying secret of header.
+	// Unverified request will be aborted.
+	VerifyRequest(r *http.Request, secret string) *errors.HTTPError
+	// ParseSlashCommnad will parse the slash command from request, and run the following command
+	ParseSlashCommand(r *http.Request) (*SlashCommandRequest, *errors.HTTPError)
+	// CreateTextMessage creates a simple text message for either Slack or Discord
+	CreateTextMessage(text string) (interface{}, *errors.HTTPError)
+	// CreateProblemMessage creates a message that will be sent to platforms like Slack or Discord.
+	// Slack uses BlockMessage to send message, while Discord uses EmbedMessage.
+	// These structures are different from each other, so we should use this function adaptively.
+	CreateProblemMessage(prob *schema.BaekjoonProb) (interface{}, *errors.HTTPError)
+	// CreateCategoryListMessage creates a message that shows a category list of baekjoon problem.
+	// Same as the reason above, we use this function to send messages depending on the platforms we use
+	CreateCategoryListMessage() (interface{}, *errors.HTTPError)
+	// CreateHelpGuideMessage creates a message that shows a help guide including command list.
+	// Same as the reason above.
+	CreateHelpGuideMessage() (interface{}, *errors.HTTPError)
 }

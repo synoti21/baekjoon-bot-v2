@@ -7,19 +7,18 @@ import (
 )
 
 type Interface interface {
-	AddUser(userID, bojID string) error
+	AddUser(userID, baekjoonID string) error
 	DeleteUser(userID string) error
-	ModifyUserBJID(userID, BJID string) error
+	ModifyBaekjoonID(userID, baekjoonID string) error
 
-	SetDailyProbTime(userID string, time time.Time) error
-	UnsetDailyProbTime(userID string) error
+	SetDailyProbRecommendTime(userID string, time time.Time) error
+	UnsetDailyProbRecommendTime(userID string) error
 
-	FindUserWithDiscordID(discordID string)
-	FindUserWithSlackID(slackID string)
-	FindUsersWithDailyProbTime(time time.Time)
-	FindAllUser()
+	FindUserWithID(userID string) (*schema.User, error)
+	FindUsersWithDailyProbTime(time time.Time) (*schema.User, error)
+	FindAllUser() (*schema.User, error)
 
 	FindProbWithID(probID int) (*schema.BaekjoonProb, error)
 
-	AddFeedback(content string)
+	AddFeedback(content string) error
 }

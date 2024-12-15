@@ -7,6 +7,7 @@ import (
 
 	"github.com/synoti21/baekjoon-slack-bot/common/consts"
 	"github.com/synoti21/baekjoon-slack-bot/common/errors"
+	"github.com/synoti21/baekjoon-slack-bot/config"
 	"github.com/synoti21/baekjoon-slack-bot/internal/client"
 	"github.com/synoti21/baekjoon-slack-bot/internal/db"
 	"github.com/synoti21/baekjoon-slack-bot/internal/db/schema"
@@ -19,7 +20,7 @@ type Bot struct {
 
 var _ Interface = (*Bot)(nil)
 
-func New(_db db.Interface, _recAPI client.ProbRecommendAPI) Interface {
+func New(_db db.Interface, _recAPI client.ProbRecommendAPI, _platform config.Platform) Interface {
 	return &Bot{
 		db:     _db,
 		recAPI: _recAPI,
@@ -110,17 +111,18 @@ func (b *Bot) GetSimilarProbByID(probID string, userID string) (*schema.Baekjoon
 	return prob, nil
 }
 
+// This function is not implemented in current version
 func (b *Bot) GetSimilarProbByContent(probContent string, userID string) (*schema.BaekjoonProb, *errors.HTTPError) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (b *Bot) ScheduleDailyProb(userID string, _time string) *errors.HTTPError {
+func (b *Bot) ScheduleDailyProbRecommend(userID string, _time string) *errors.HTTPError {
 	t, err := time.Parse("15 04", _time)
 	if err != nil {
 		return errors.NewBadRequestError(err.Error())
 	}
 
-	err = b.db.SetDailyProbTime(userID, t)
+	err = b.db.SetDailyProbRecommendTime(userID, t)
 	if err != nil {
 		return errors.NewInternalServerError(err.Error())
 	}
@@ -128,8 +130,8 @@ func (b *Bot) ScheduleDailyProb(userID string, _time string) *errors.HTTPError {
 	return nil
 }
 
-func (b *Bot) UnscheduleDailyProb(userID string) *errors.HTTPError {
-	err := b.db.UnsetDailyProbTime(userID)
+func (b *Bot) UnscheduleDailyProbRecommend(userID string) *errors.HTTPError {
+	err := b.db.UnsetDailyProbRecommendTime(userID)
 	if err != nil {
 		return errors.NewInternalServerError(err.Error())
 	}
