@@ -1,0 +1,66 @@
+name: "baekjoon-bot-v2-cicd"
+run-name: Slack Bot CI/CD Pipeline
+
+on:
+  push:
+    branches: ["main"]
+    paths-ignore:
+    - '.github/**'
+    - 'deployments/**'
+    - 'docs/**'
+
+concurrency:
+    group: slack-api
+    cancel-in-progress: true
+
+jobs:
+  build-and-push-docker:
+    name: Build & Push Docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+
+      - name: Docker login
+        run: |
+          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Build Docker image
+        run: |
+          IMAGE_NAME="${{ secrets.DOCKERHUB_USERNAME }}/baekjoon-bot"
+          IMAGE_TAG=$(date +%s)
+
+          docker build -t $IMAGE_NAME:$IMAGE_TAG .
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: Push Docker image
+        run: |
+          docker push $IMAGE_NAME:$IMAGE_TAG
+
+  update-helm:
+    name: Update Helm Values
+    runs-on: ubuntu-latest
+    needs: build-and-push-docker
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Update Helm chart with new Docker image tag
+        run: |
+          IMAGE_NAME="${{ env.IMAGE_NAME }}"
+          IMAGE_TAG="${{ env.IMAGE_TAG }}"
+
+          yq e ".image.repository = \"$IMAGE_NAME\" | .image.tag = \"$IMAGE_TAG\"" -i deployments/helm/values.yaml
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git commit -am "chore: update helm values to $IMAGE_NAME:$IMAGE_TAG"
+          git push
