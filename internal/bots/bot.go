@@ -7,7 +7,6 @@ import (
 
 	"github.com/synoti21/baekjoon-slack-bot/common/consts"
 	"github.com/synoti21/baekjoon-slack-bot/common/errors"
-	"github.com/synoti21/baekjoon-slack-bot/config"
 	"github.com/synoti21/baekjoon-slack-bot/internal/client"
 	"github.com/synoti21/baekjoon-slack-bot/internal/db"
 	"github.com/synoti21/baekjoon-slack-bot/internal/db/schema"
@@ -15,12 +14,12 @@ import (
 
 type Bot struct {
 	db     db.Interface
-	recAPI client.ProbRecommendAPI
+	recAPI client.ProblemRecommendClient
 }
 
 var _ Interface = (*Bot)(nil)
 
-func New(_db db.Interface, _recAPI client.ProbRecommendAPI, _platform config.Platform) Interface {
+func New(_db db.Interface, _recAPI client.ProblemRecommendClient) Interface {
 	return &Bot{
 		db:     _db,
 		recAPI: _recAPI,
@@ -46,14 +45,14 @@ func (b *Bot) WithdrawUser(userID string) *errors.HTTPError {
 }
 
 func (b *Bot) GetRecommendedProb(userID string) (*schema.BaekjoonProb, *errors.HTTPError) {
-	resp, err := b.recAPI.GetProbsByUserID(userID, 1)
+	resp, err := b.recAPI.GetProblemsByUserID(userID, 1)
 	if err != nil {
 		return nil, errors.NewInternalServerError(err.Error())
 	}
 
-	pid, ok := resp.ProbIDsByUserID[userID]
+	pid, ok := resp.ProblemIDsByUserID[userID]
 	if len(pid) != 1 || !ok {
-		return nil, errors.NewInternalServerError(fmt.Sprintf("Invalid baekjoon problem response: %v", resp.ProbIDsByUserID))
+		return nil, errors.NewInternalServerError(fmt.Sprintf("Invalid baekjoon problem response: %v", resp.ProblemIDsByUserID))
 	}
 
 	prob, err := b.db.FindProbWithID(pid[0])
@@ -69,14 +68,14 @@ func (b *Bot) GetRecommendedProbByCategory(userID string, categoryType string) (
 	if err != nil {
 		return nil, errors.NewBadRequestError(err.Error())
 	}
-	resp, err := b.recAPI.GetProbsByCategory(pc)
+	resp, err := b.recAPI.GetProblemsByCategory(pc)
 	if err != nil {
 		return nil, errors.NewInternalServerError(err.Error())
 	}
 
-	pid, ok := resp.ProbIDsByCategory[pc]
+	pid, ok := resp.ProblemIDsByCategory[pc]
 	if len(pid) != 1 || !ok {
-		return nil, errors.NewInternalServerError(fmt.Sprintf("Invalid baekjoon prob response: %v", resp.ProbIDsByCategory))
+		return nil, errors.NewInternalServerError(fmt.Sprintf("Invalid baekjoon prob response: %v", resp.ProblemIDsByCategory))
 	}
 
 	prob, err := b.db.FindProbWithID(pid[0])
@@ -93,14 +92,14 @@ func (b *Bot) GetSimilarProbByID(probID string, userID string) (*schema.Baekjoon
 		return nil, errors.NewBadRequestError("problem ID should be number")
 	}
 
-	resp, err := b.recAPI.GetSimilarProbsByProbIDs(int(pid))
+	resp, err := b.recAPI.GetSimilarProblemsByProblemIDs(int(pid))
 	if err != nil {
 		return nil, errors.NewInternalServerError(err.Error())
 	}
 
-	pidResp, ok := resp.SimilarProbIDsByProbID[probID]
+	pidResp, ok := resp.SimilarProblemIDsByProblemID[probID]
 	if len(pidResp) != 1 || !ok {
-		return nil, errors.NewInternalServerError(fmt.Sprintf("Invalid baekjoon prob response: %v", resp.ProbIDsByCategory))
+		return nil, errors.NewInternalServerError(fmt.Sprintf("Invalid baekjoon prob response: %v", resp.ProblemIDsByCategory))
 	}
 
 	prob, err := b.db.FindProbWithID(pidResp[0])

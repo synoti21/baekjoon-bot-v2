@@ -19,7 +19,7 @@ var commandMap map[string]SlashCommand = map[string]SlashCommand{
 	"/quit":         SCWithdraw,
 	"/prob":         SCRecommendSingleProblem,
 	"/category":     SCRecommendByCategory,
-	"/simliarid":    SCRecommendSimilarProblem,
+	"/similarid":    SCRecommendSimilarProblem,
 	"/daily":        SCScheduleDailyProblem,
 	"/deactivate":   SCUnscheduleDailyProblem,
 	"/categorylist": SCShowCategoryList,

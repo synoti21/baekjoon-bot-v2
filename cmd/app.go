@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/synoti21/baekjoon-slack-bot/api/handlers"
 	"github.com/synoti21/baekjoon-slack-bot/common/errors"
 	"github.com/synoti21/baekjoon-slack-bot/config"
@@ -17,7 +19,7 @@ func (cg *CommandGroup) RegisterApp(app *cli.App) {
 	app.Commands = append(app.Commands,
 		&cli.Command{
 			Name:        "start",
-			Description: "Starts the Baekjoon bot server",
+			Description: "Starts the Baekjoon bot server for Slack or Discord. Example: baekjoon-bot start --platform slack --mode proxy --port 8080",
 			Action:      cg.Start,
 			Flags: []cli.Flag{
 				&flagPort,
@@ -37,8 +39,6 @@ func (cg *CommandGroup) RegisterApp(app *cli.App) {
 }
 
 func (cg *CommandGroup) Start(cliCtx *cli.Context) error {
-	var db db.Interface
-
 	platform, err := parsePlatformFromCtx(cliCtx)
 	if err != nil {
 		return err
@@ -58,34 +58,31 @@ func (cg *CommandGroup) Start(cliCtx *cli.Context) error {
 		return err
 	}
 
+	var db db.Interface
 	switch dcfg.Type {
 	case config.DatabaseTypeMongoDB:
 		db = mongo.New(dcfg)
-	case config.DatabaseTypeMySQL:
-		return errors.NewInternalServerError("MySQL not supported in this version")
-	case config.DatabaseTypePostgres:
-		return errors.NewInternalServerError("Postgres not supported in this version")
-	case config.DatabaseTypeDryRun:
-		return errors.NewInternalServerError("DryRun not supported in this version")
+	case config.DatabaseTypeMySQL, config.DatabaseTypePostgres, config.DatabaseTypeDryRun:
+		return errors.NewInternalServerError(fmt.Sprintf("Database type %s not supported in this version", dcfg.Type))
 	default:
 		return errors.NewInternalServerError("Invalid database mode")
 	}
 
-	recAPI, err := client.NewProbRecommandSvc()
+	pr, err := client.NewProblemRecommendClient()
 	if err != nil {
 		return err
 	}
 
-	bot := bots.New(db, recAPI)
+	bot := bots.New(db, pr)
 
 	h, err := handlers.New(hcfg, bot)
 	if err != nil {
 		return err
 	}
-	h.Run()
-	return nil
+
+	return h.Run()
 }
 
 func (cg *CommandGroup) Daily(cliCtx *cli.Context) error {
-	panic("not implemented") //TODO: implement
+	return errors.NewInternalServerError("Daily command is not implemented yet")
 }

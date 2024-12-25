@@ -48,15 +48,15 @@ func (h *SlashCommandHandler) Run() error {
 		return errors.NewBadRequestError(fmt.Sprintf("Invalid config port: %v", port))
 	}
 	r := gin.Default()
-
-	r.Use(middlewares.VerifyRequestMiddleware(h.adapter, h.config.Secret))
-	r.Use(middlewares.ErrorHandlingMiddleware())
-
 	r.GET("/healthz", h.healthz())
-	r.POST(h.config.RouteEndpoint(), h.SlashCommandHandlerFunc())
 
-	r.Run(":" + port)
-	return nil
+	protected := r.Group("/")
+	protected.Use(middlewares.VerifyRequestMiddleware(h.adapter, h.config.Secret))
+	protected.Use(middlewares.ErrorHandlingMiddleware())
+
+	protected.POST(h.config.RouteEndpoint(), h.SlashCommandHandlerFunc())
+
+	return r.Run(":" + port)
 }
 
 // SlashCommandHandlerFunc is a handler function used by gin, to activate the slash command handler logics
