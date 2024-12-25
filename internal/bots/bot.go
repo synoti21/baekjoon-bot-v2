@@ -13,16 +13,16 @@ import (
 )
 
 type Bot struct {
-	db     db.Interface
-	recAPI client.ProblemRecommendClient
+	db      db.Interface
+	probRec client.ProblemRecommendClient
 }
 
 var _ Interface = (*Bot)(nil)
 
-func New(_db db.Interface, _recAPI client.ProblemRecommendClient) Interface {
+func New(_db db.Interface, _prc client.ProblemRecommendClient) Interface {
 	return &Bot{
-		db:     _db,
-		recAPI: _recAPI,
+		db:      _db,
+		probRec: _prc,
 	}
 }
 
@@ -45,7 +45,7 @@ func (b *Bot) WithdrawUser(userID string) *errors.BaseError {
 }
 
 func (b *Bot) GetRecommendedProb(userID string) (*schema.BaekjoonProb, *errors.BaseError) {
-	resp, err := b.recAPI.GetProblemsByUserID(userID, 1)
+	resp, err := b.probRec.GetProblemsByUserID(userID, 1)
 	if err != nil {
 		return nil, errors.NewInternalServerError(err.Error())
 	}
@@ -68,7 +68,7 @@ func (b *Bot) GetRecommendedProbByCategory(userID string, categoryType string) (
 	if err != nil {
 		return nil, errors.NewBadRequestError(err.Error())
 	}
-	resp, err := b.recAPI.GetProblemsByCategory(pc)
+	resp, err := b.probRec.GetProblemsByCategory(pc)
 	if err != nil {
 		return nil, errors.NewInternalServerError(err.Error())
 	}
@@ -92,7 +92,7 @@ func (b *Bot) GetSimilarProbByID(probID string, userID string) (*schema.Baekjoon
 		return nil, errors.NewBadRequestError("problem ID should be number")
 	}
 
-	resp, err := b.recAPI.GetSimilarProblemsByProblemIDs(int(pid))
+	resp, err := b.probRec.GetSimilarProblemsByProblemIDs(int(pid))
 	if err != nil {
 		return nil, errors.NewInternalServerError(err.Error())
 	}
