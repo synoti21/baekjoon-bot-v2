@@ -13,12 +13,12 @@ func ErrorHandlingMiddleware() gin.HandlerFunc {
 		ctx.Next()
 		if len(ctx.Errors) > 0 {
 			for _, e := range ctx.Errors {
-				if httpErr, ok := e.Err.(*errors.HTTPError); ok {
-					ctx.String(httpErr.GetStatusCode(), httpErr.GetErrorMsg())
+				if httpErr, ok := e.Err.(*errors.BaseError); ok {
+					ctx.JSON(httpErr.GetStatusCode(), gin.H{"error": httpErr.GetErrorMsg()})
 					return
 				}
 			}
-			ctx.String(http.StatusInternalServerError, "Internal Server Error")
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": ctx.Errors.Errors()})
 		}
 	}
 }

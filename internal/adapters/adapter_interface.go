@@ -27,19 +27,19 @@ type SlashCommandRequest struct {
 type Interface interface {
 	// VerifyRequest verfies the slash command request from platforms, by verifying secret of header.
 	// Unverified request will be aborted.
-	VerifyRequest(r *http.Request, secret string) *errors.HTTPError
+	VerifyRequest(r *http.Request, secret string) *errors.BaseError
 	// ParseSlashCommnad will parse the slash command from request, and run the following command
-	ParseSlashCommand(r *http.Request) (*SlashCommandRequest, *errors.HTTPError)
+	ParseSlashCommand(r *http.Request) (*SlashCommandRequest, *errors.BaseError)
 	// CreateTextMessage creates a simple text message for either Slack or Discord
-	CreateTextMessage(text string) (interface{}, *errors.HTTPError)
+	CreateTextMessage(text string) (interface{}, *errors.BaseError)
 	// CreateProblemMessage creates a message that will be sent to platforms like Slack or Discord.
 	// Slack uses BlockMessage to send message, while Discord uses EmbedMessage.
 	// These structures are different from each other, so we should use this function adaptively.
-	CreateProblemMessage(prob *schema.BaekjoonProb) (interface{}, *errors.HTTPError)
+	CreateProblemMessage(prob *schema.BaekjoonProb) (interface{}, *errors.BaseError)
 	// CreateCategoryListMessage creates a message that shows a category list of baekjoon problem.
 	// Same as the reason above, we use this function to send messages depending on the platforms we use
-	CreateCategoryListMessage() (interface{}, *errors.HTTPError)
+	CreateCategoryListMessage() (interface{}, *errors.BaseError)
 	// CreateHelpGuideMessage creates a message that shows a help guide including command list.
 	// Same as the reason above.
-	CreateHelpGuideMessage() (interface{}, *errors.HTTPError)
+	CreateHelpGuideMessage() (interface{}, *errors.BaseError)
 }

@@ -12,26 +12,26 @@ type Adapter struct{}
 
 var _ adapters.Interface = (*Adapter)(nil)
 
-func (a *Adapter) VerifyRequest(r *http.Request, secret string) *errors.HTTPError {
+func (a *Adapter) VerifyRequest(r *http.Request, secret string) *errors.BaseError {
 	panic("not implemented") // TODO: Implement
 }
 
-func (a *Adapter) ParseSlashCommand(r *http.Request) (*adapters.SlashCommandRequest, *errors.HTTPError) {
+func (a *Adapter) ParseSlashCommand(r *http.Request) (*adapters.SlashCommandRequest, *errors.BaseError) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (a *Adapter) CreateTextMessage(text string) (interface{}, *errors.HTTPError) {
+func (a *Adapter) CreateTextMessage(text string) (interface{}, *errors.BaseError) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (a *Adapter) CreateCategoryListMessage() (interface{}, *errors.HTTPError) {
+func (a *Adapter) CreateCategoryListMessage() (interface{}, *errors.BaseError) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (a *Adapter) CreateHelpGuideMessage() (interface{}, *errors.HTTPError) {
+func (a *Adapter) CreateHelpGuideMessage() (interface{}, *errors.BaseError) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (a *Adapter) CreateProblemMessage(prob *schema.BaekjoonProb) (interface{}, *errors.HTTPError) {
+func (a *Adapter) CreateProblemMessage(prob *schema.BaekjoonProb) (interface{}, *errors.BaseError) {
 	panic("not implemented") // TODO: Implement
 }

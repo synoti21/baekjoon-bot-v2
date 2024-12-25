@@ -16,7 +16,7 @@ type Adapter struct{}
 
 var _ adapters.Interface = (*Adapter)(nil)
 
-func (a *Adapter) VerifyRequest(r *http.Request, secret string) *errors.HTTPError {
+func (a *Adapter) VerifyRequest(r *http.Request, secret string) *errors.BaseError {
 	v, err := slack.NewSecretsVerifier(r.Header, secret)
 	if err != nil {
 		return errors.NewBadRequestError(err.Error())
@@ -39,7 +39,7 @@ func (a *Adapter) VerifyRequest(r *http.Request, secret string) *errors.HTTPErro
 	return nil
 }
 
-func (a *Adapter) ParseSlashCommand(r *http.Request) (*adapters.SlashCommandRequest, *errors.HTTPError) {
+func (a *Adapter) ParseSlashCommand(r *http.Request) (*adapters.SlashCommandRequest, *errors.BaseError) {
 	s, err := slack.SlashCommandParse(r)
 	if err != nil {
 		return nil, errors.NewInternalServerError(err.Error())
@@ -58,18 +58,18 @@ func (a *Adapter) ParseSlashCommand(r *http.Request) (*adapters.SlashCommandRequ
 	}, nil
 }
 
-func (a *Adapter) CreateTextMessage(text string) (interface{}, *errors.HTTPError) {
+func (a *Adapter) CreateTextMessage(text string) (interface{}, *errors.BaseError) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (a *Adapter) CreateCategoryListMessage() (interface{}, *errors.HTTPError) {
+func (a *Adapter) CreateCategoryListMessage() (interface{}, *errors.BaseError) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (a *Adapter) CreateHelpGuideMessage() (interface{}, *errors.HTTPError) {
+func (a *Adapter) CreateHelpGuideMessage() (interface{}, *errors.BaseError) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (a *Adapter) CreateProblemMessage(prob *schema.BaekjoonProb) (interface{}, *errors.HTTPError) {
+func (a *Adapter) CreateProblemMessage(prob *schema.BaekjoonProb) (interface{}, *errors.BaseError) {
 	panic("not implemented") // TODO: Implement
 }

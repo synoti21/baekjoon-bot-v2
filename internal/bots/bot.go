@@ -26,7 +26,7 @@ func New(_db db.Interface, _recAPI client.ProblemRecommendClient) Interface {
 	}
 }
 
-func (b *Bot) RegisterUser(userID string, bojID string) *errors.HTTPError {
+func (b *Bot) RegisterUser(userID string, bojID string) *errors.BaseError {
 	err := b.db.AddUser(userID, bojID)
 	if err != nil {
 		return errors.NewInternalServerError(err.Error())
@@ -35,7 +35,7 @@ func (b *Bot) RegisterUser(userID string, bojID string) *errors.HTTPError {
 	return nil
 }
 
-func (b *Bot) WithdrawUser(userID string) *errors.HTTPError {
+func (b *Bot) WithdrawUser(userID string) *errors.BaseError {
 	err := b.db.DeleteUser(userID)
 	if err != nil {
 		return errors.NewInternalServerError(err.Error())
@@ -44,7 +44,7 @@ func (b *Bot) WithdrawUser(userID string) *errors.HTTPError {
 	return nil
 }
 
-func (b *Bot) GetRecommendedProb(userID string) (*schema.BaekjoonProb, *errors.HTTPError) {
+func (b *Bot) GetRecommendedProb(userID string) (*schema.BaekjoonProb, *errors.BaseError) {
 	resp, err := b.recAPI.GetProblemsByUserID(userID, 1)
 	if err != nil {
 		return nil, errors.NewInternalServerError(err.Error())
@@ -63,7 +63,7 @@ func (b *Bot) GetRecommendedProb(userID string) (*schema.BaekjoonProb, *errors.H
 	return prob, nil
 }
 
-func (b *Bot) GetRecommendedProbByCategory(userID string, categoryType string) (*schema.BaekjoonProb, *errors.HTTPError) {
+func (b *Bot) GetRecommendedProbByCategory(userID string, categoryType string) (*schema.BaekjoonProb, *errors.BaseError) {
 	pc, err := consts.ValidateProbCategory(categoryType)
 	if err != nil {
 		return nil, errors.NewBadRequestError(err.Error())
@@ -86,7 +86,7 @@ func (b *Bot) GetRecommendedProbByCategory(userID string, categoryType string) (
 	return prob, nil
 }
 
-func (b *Bot) GetSimilarProbByID(probID string, userID string) (*schema.BaekjoonProb, *errors.HTTPError) {
+func (b *Bot) GetSimilarProbByID(probID string, userID string) (*schema.BaekjoonProb, *errors.BaseError) {
 	pid, err := strconv.ParseInt(probID, 0, 64)
 	if err != nil {
 		return nil, errors.NewBadRequestError("problem ID should be number")
@@ -111,11 +111,11 @@ func (b *Bot) GetSimilarProbByID(probID string, userID string) (*schema.Baekjoon
 }
 
 // This function is not implemented in current version
-func (b *Bot) GetSimilarProbByContent(probContent string, userID string) (*schema.BaekjoonProb, *errors.HTTPError) {
+func (b *Bot) GetSimilarProbByContent(probContent string, userID string) (*schema.BaekjoonProb, *errors.BaseError) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (b *Bot) ScheduleDailyProbRecommend(userID string, _time string) *errors.HTTPError {
+func (b *Bot) ScheduleDailyProbRecommend(userID string, _time string) *errors.BaseError {
 	t, err := time.Parse("15 04", _time)
 	if err != nil {
 		return errors.NewBadRequestError(err.Error())
@@ -129,7 +129,7 @@ func (b *Bot) ScheduleDailyProbRecommend(userID string, _time string) *errors.HT
 	return nil
 }
 
-func (b *Bot) UnscheduleDailyProbRecommend(userID string) *errors.HTTPError {
+func (b *Bot) UnscheduleDailyProbRecommend(userID string) *errors.BaseError {
 	err := b.db.UnsetDailyProbRecommendTime(userID)
 	if err != nil {
 		return errors.NewInternalServerError(err.Error())

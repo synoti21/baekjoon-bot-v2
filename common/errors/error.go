@@ -5,60 +5,60 @@ import (
 	"net/http"
 )
 
-type HTTPError struct {
+type BaseError struct {
 	statusCode int
 	msg        string
 }
 
-func (e *HTTPError) Error() string {
+func (e *BaseError) Error() string {
 	return fmt.Sprintf("%d: %s", e.statusCode, e.msg)
 }
 
-func (e *HTTPError) GetStatusCode() int {
+func (e *BaseError) GetStatusCode() int {
 	return e.statusCode
 }
 
-func (e *HTTPError) GetErrorMsg() string {
+func (e *BaseError) GetErrorMsg() string {
 	return e.msg
 }
 
-func NewBadRequestError(traceback string) *HTTPError {
-	return &HTTPError{
+func NewBadRequestError(traceback string) *BaseError {
+	return &BaseError{
 		statusCode: http.StatusBadRequest,
 		msg:        fmt.Sprintf("Bad Request: %s", traceback),
 	}
 }
 
-func NewUnauthorizedError(msg string) *HTTPError {
-	return &HTTPError{
+func NewUnauthorizedError(msg string) *BaseError {
+	return &BaseError{
 		statusCode: http.StatusUnauthorized,
 		msg:        fmt.Sprintf("Unauthorized: %s", msg),
 	}
 }
 
-func NewForbiddenError(msg string) *HTTPError {
-	return &HTTPError{
+func NewForbiddenError(msg string) *BaseError {
+	return &BaseError{
 		statusCode: http.StatusForbidden,
 		msg:        fmt.Sprintf("Forbidden: %s", msg),
 	}
 }
 
-func NewNotFoundError(traceback string) *HTTPError {
-	return &HTTPError{
+func NewNotFoundError(traceback string) *BaseError {
+	return &BaseError{
 		statusCode: http.StatusNotFound,
 		msg:        fmt.Sprintf("Not Found: %s", traceback),
 	}
 }
 
-func NewInvalidSlashCommandError(traceback string) *HTTPError {
-	return &HTTPError{
+func NewInvalidSlashCommandError(traceback string) *BaseError {
+	return &BaseError{
 		statusCode: http.StatusInternalServerError,
 		msg:        fmt.Sprintf("Invalid Slash Command: %s", traceback),
 	}
 }
 
-func NewInternalServerError(traceback string) *HTTPError {
-	return &HTTPError{
+func NewInternalServerError(traceback string) *BaseError {
+	return &BaseError{
 		statusCode: http.StatusInternalServerError,
 		msg:        fmt.Sprintf("Internal Server Error: %s", traceback),
 	}

@@ -9,7 +9,7 @@ import (
 )
 
 // RunBotSlashCommand runs the main logics depending on the slash command type.
-func (h *SlashCommandHandler) RunBotSlashCommand(req *adapters.SlashCommandRequest) (interface{}, *errors.HTTPError) {
+func (h *SlashCommandHandler) RunBotSlashCommand(req *adapters.SlashCommandRequest) (interface{}, *errors.BaseError) {
 	switch req.Command {
 	// /register
 	case consts.SCRegister:
