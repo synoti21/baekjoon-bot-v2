@@ -2,7 +2,7 @@ name: "baekjoon-slack-bot-PR"
 run-name: Slack Bot PR
 
 on:
-  push:
+  pull_request:
     branches: ["main"]
     paths-ignore:
     - '.github/**'
