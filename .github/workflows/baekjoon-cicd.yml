@@ -1,5 +1,5 @@
 name: "baekjoon-bot-v2-cicd"
-run-name: Slack Bot CI/CD Pipeline
+run-name: Baekjoon Bot CI/CD Pipeline
 
 on:
   push:
