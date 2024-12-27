@@ -1,5 +1,5 @@
-name: "baekjoon-slack-bot-PR"
-run-name: Slack Bot PR
+name: "baekjoon-bot-PR"
+run-name: Baekjoon Bot PR
 
 on:
   pull_request:
